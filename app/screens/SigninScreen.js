@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import axios from "axios";
 import { useDispatch } from "react-redux";
 import {
   View,
@@ -9,48 +10,79 @@ import {
   Platform,
   SafeAreaView,
 } from "react-native";
-import { Formik } from "formik";
+import { Formik, useFormik, validateYupSchema } from "formik";
 import * as Yup from "yup"; // Import Yup for validation
 
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../config/colors";
 import { loginSchema } from "../validations/validations";
 import { login } from "../services";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SigninScreen = ({ navigation }) => {
-  const initialValues = {
-    email: "",
-    password: "",
-  };
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
 
-  const handleLogin = async (values) => {
-    try {
-      const { email, password } = values;
-      const response = await login({ email, password });
-      // console.log("====================================");
-      // console.log("response", response);
-      // console.log("====================================");
-      const { user, token } = response.data;
+  function handleSubmit() {
+    console.log(email, password);
+    const userData = {
+      email: email,
+      password,
+    };
+    axios
+      .post("http://localhost:5000/api/users/login", userData)
+      .then((res) => console.log(res.data))
+      .catch((e) => console.log(e));
 
-      // Store token in AsyncStorage
-      await AsyncStorage.setItem("token", token);
+    // try{
 
-      // Dispatch action to Redux store (assuming you're using Redux)
-      const dispatch = useDispatch();
-      dispatch({ type: "LOGIN", payload: { id: user.userId, email } });
-      // ale;
-      // Navigate to dashboard screen
-      navigation.navigate("Bottom Navigation");
-    } catch (error) {
-      console.error("Login failed:", error);
-      navigation.navigate("Bottom Navigation");
+    //   const { email, password } = values;
 
-      // Handle login failure
-    }
-  };
+    //   const response = await login({
+    //     email,
+    //     password
+    //   }).then(() => {
+    //     if(response.status==200){
+    //       AsyncStorage.setItem("Access Token", response.data);
+    //       console.log("success")
+    //       navigation.navigate("Bottom Navigation");
+
+    //     }
+    //   })
+    // }
+    // catch (error){
+    //   console.log(error);
+    // }
+  }
+
+  // const handleLogin = async (values) => {
+
+  //   try {
+  //     const { email, password } = values;
+  //     const response = await login({ email, password });
+  //     // console.log("====================================");
+  //     console.log("response", response);
+  //     // console.log("====================================");
+  //     const { user, token } = response.data;
+
+  //     // Store token in AsyncStorage
+  //     await AsyncStorage.setItem("token", token);
+
+  //     // Dispatch action to Redux store (assuming you're using Redux)
+  //     const dispatch = useDispatch();
+  //     dispatch({ type: "LOGIN", payload: { id: user.userId, email } });
+  //     // ale;
+  //     // Navigate to dashboard screen
+  //     navigation.navigate("Bottom Navigation");
+  //   } catch (error) {
+  //     console.error(error);
+  //     // navigation.navigate("Bottom Navigation");
+
+  //     // Handle login failure
+  //   }
+  // };
 
   const [showPassword, setShowPassword] = useState(false);
-
   const toggleShowPassword = () => {
     setShowPassword(!showPassword);
   };
@@ -66,11 +98,10 @@ const SigninScreen = ({ navigation }) => {
       <Text style={styles.title}>Login</Text>
 
       <Formik
-        initialValues={initialValues}
+        // initialValues={initialValues}
         validationSchema={loginSchema}
-        onSubmit={handleLogin}
       >
-        {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+        {({ errors }) => (
           <View style={styles.inputContainer}>
             <View style={styles.inputIconContainer}>
               <Ionicons
@@ -84,9 +115,6 @@ const SigninScreen = ({ navigation }) => {
                 placeholder="Email Address"
                 keyboardType="email-address"
                 autoCapitalize="none"
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                value={values.email}
               />
             </View>
             {errors.email && <Text style={styles.error}>{errors.email}</Text>}
@@ -100,29 +128,36 @@ const SigninScreen = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Password"
-                secureTextEntry
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
+                secureTextEntry={showPassword}
               />
               <TouchableOpacity
                 onPress={toggleShowPassword}
                 style={styles.eyeButton}
               >
-                <Ionicons
-                  name={showPassword ? "eye-off-outline" : "eye-outline"}
-                  size={20}
-                  color="gray"
-                />
+                {password.length > 1 ? null : showPassword ? (
+                  <Ionicons
+                    name="eye-off"
+                    style={{ marginRight: 10 }}
+                    size={20}
+                    color={colors.primary}
+                  />
+                ) : (
+                  <Ionicons
+                    name="eye"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                    color={colors.primary}
+                  />
+                )}
               </TouchableOpacity>
             </View>
             {errors.password && (
               <Text style={styles.error}>{errors.password}</Text>
             )}
             <View style={styles.row}>
-              <View style={styles.rememberMeContainer}>
+              {/* <View style={styles.rememberMeContainer}>
                 <TouchableOpacity
-                  onPress={() => handleChange("rememberMe")(!values.rememberMe)}
+                  // onPress={() => handleChange("rememberMe")(!values.rememberMe)}
                   style={styles.checkbox}
                 >
                   {values.rememberMe && (
@@ -137,20 +172,23 @@ const SigninScreen = ({ navigation }) => {
                   )}
                 </TouchableOpacity>
                 <Text style={styles.rememberMeText}>Remember me</Text>
-              </View>
+              </View> */}
               <TouchableOpacity>
                 <Text style={styles.forgotPassword}>Forgot Password?</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity style={styles.loginButton} onPress={handleSubmit}>
+            <TouchableOpacity
+              style={styles.loginButton}
+              onPress={() => handleSubmit()}
+            >
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
-      <View style={styles.signUpTextContainer}>
-        <Text style={styles.signUpText}>Don't have an account? </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Register")}>
-          <Text style={styles.signUpLink}>Sign up</Text>
-        </TouchableOpacity>
-      </View>
+            <View style={styles.signUpTextContainer}>
+              <Text style={styles.signUpText}>Don't have an account? </Text>
+              <TouchableOpacity onPress={() => navigation.navigate("Register")}>
+                <Text style={styles.signUpLink}>Sign up</Text>
+              </TouchableOpacity>
+            </View>
           </View>
         )}
       </Formik>
@@ -170,7 +208,8 @@ const styles = StyleSheet.create({
       android: {
         padding: 20,
       },
-    }),    top: 25,
+    }),
+    top: 25,
   },
   backButton: {
     position: "absolute",
@@ -244,8 +283,8 @@ const styles = StyleSheet.create({
   signUpTextContainer: {
     flexDirection: "row",
     // marginTop: "90%",
-    padding:"2%",
-    justifyContent:"center",
+    padding: "2%",
+    justifyContent: "center",
   },
   signUpText: {
     color: "black",

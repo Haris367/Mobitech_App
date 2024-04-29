@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useState } from "react";
+import axios from "axios";
 import {
   View,
   Text,
@@ -14,39 +15,48 @@ import { signupSchema } from "../validations/validations";
 import { signup } from "../services";
 
 const RegistrationScreen = ({ navigation }) => {
-  const initialValues = {
-    // firstName: "",
-    // lastName: "",
-    email: "",
-    password: "",
-  };
+  // const handleSignUp = async (values) => {
+  //   try {
+  //     const { email, password } = values;
+  //     const response = await signup({ email, password });
+  //     const { user, token } = response.data;
 
-  const handleSignUp = async (values) => {
-    try {
-      const { email, password } = values;
-      const response = await signup({ email, password });
-      const { user, token } = response.data;
+  //     await AsyncStorage.setItem("token", token);
 
-      await AsyncStorage.setItem("token", token);
+  //     console.log("Sign up successful:", email, password);
 
-      console.log("Sign up successful:", email, password);
+  //     navigation.navigate("Signin"); // Navigate to next screen on success
+  //   } catch (error) {
+  //     console.error("Sign up failed:", error);
+  //     // Handle sign-up failure
+  //   }
+  // };
 
-      navigation.navigate("Signin"); // Navigate to next screen on success
-    } catch (error) {
-      console.error("Sign up failed:", error);
-      // Handle sign-up failure
-    }
+  function handleSubmit() {
+    const userData = {
+      email: email,
+      password,
+    };
+    axios
+      .post("http://localhost:5000/api/users/signup")
+      .then((res) => console.log(res.data))
+      .catch((e) => console.log(e));
+  }
+
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const [showPassword, setShowPassword] = useState(false);
+
+  const toggleShowPassword = () => {
+    setShowPassword(!showPassword);
   };
 
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={signupSchema}
-        onSubmit={handleSignUp}
-      >
-        {({ handleChange, handleBlur, handleSubmit, values, errors }) => (
+      <Formik validationSchema={signupSchema}>
+        {({ errors }) => (
           <View style={styles.inputContainer}>
             {/* <View style={styles.inputIconContainer}>
               <Ionicons
@@ -95,15 +105,7 @@ const RegistrationScreen = ({ navigation }) => {
                 color="gray"
                 style={styles.inputIcon}
               />
-              <TextInput
-                style={styles.input}
-                placeholder="Email Address"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                onChangeText={handleChange("email")}
-                onBlur={handleBlur("email")}
-                value={values.email}
-              />
+              <TextInput style={styles.input} placeholder="Email Address" />
             </View>
             {errors.email && <Text style={styles.error}>{errors.email}</Text>}
 
@@ -118,18 +120,35 @@ const RegistrationScreen = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Password"
-                secureTextEntry
-                onChangeText={handleChange("password")}
-                onBlur={handleBlur("password")}
-                value={values.password}
+                secureTextEntry={showPassword}
               />
+              <TouchableOpacity
+                onPress={toggleShowPassword}
+                style={styles.eyeButton}
+              >
+                {password.length > 1 ? null : showPassword ? (
+                  <Ionicons
+                    name="eye-off"
+                    style={{ marginRight: 10 }}
+                    size={20}
+                    color={colors.primary}
+                  />
+                ) : (
+                  <Ionicons
+                    name="eye"
+                    size={20}
+                    style={{ marginRight: 10 }}
+                    color={colors.primary}
+                  />
+                )}
+              </TouchableOpacity>
             </View>
             {errors.password && (
               <Text style={styles.error}>{errors.password}</Text>
             )}
             <TouchableOpacity
               style={styles.signUpButton}
-              onPress={handleSubmit}
+              onPress={()=>handleSubmit()}
             >
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>

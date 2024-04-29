@@ -27,7 +27,7 @@ const Sell = ({navigation}) => {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity>
+        <TouchableOpacity onPress={()=>navigation.navigate("")}>
           <View style={styles.box}>
             <Text style={styles.boxHeadingText}>Sell it myself!</Text>
             <Text style={styles.boxText}>
