@@ -10,41 +10,37 @@ import {
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../config/colors";
-import { Formik } from "formik";
+import { Formik, useFormik } from "formik";
 import { signupSchema } from "../validations/validations";
 import { signup } from "../services";
 
 const RegistrationScreen = ({ navigation }) => {
-  // const handleSignUp = async (values) => {
-  //   try {
-  //     const { email, password } = values;
-  //     const response = await signup({ email, password });
-  //     const { user, token } = response.data;
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: signupSchema,
+    onSubmit: async (values) => {
+      try {
+        const { email, password } = values;
+        const response = await signup({ email, password });
+        console.log("response", response);
 
-  //     await AsyncStorage.setItem("token", token);
-
-  //     console.log("Sign up successful:", email, password);
-
-  //     navigation.navigate("Signin"); // Navigate to next screen on success
-  //   } catch (error) {
-  //     console.error("Sign up failed:", error);
-  //     // Handle sign-up failure
-  //   }
-  // };
-
-  function handleSubmit() {
-    const userData = {
-      email: email,
-      password,
-    };
-    axios
-      .post("http://localhost:5000/api/users/signup")
-      .then((res) => console.log(res.data))
-      .catch((e) => console.log(e));
-  }
-
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+        const { user, token } = response.data;
+        await AsyncStorage.setItem("token", token);
+        // dispatch({ type: "LOGIN", payload: { id: user.userId, email } });
+        navigation.navigate("Signin");
+      } catch (e) {
+        console.log(e?.response?.data || e.response?.data?.message);
+        if (e.response?.status === 401) {
+          formik.errors.email = "Invalid email or password";
+          formik.errors.password = "Invalid email or password";
+        }
+      }
+    },
+  });
 
   const [showPassword, setShowPassword] = useState(false);
 
@@ -55,8 +51,12 @@ const RegistrationScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      <Formik validationSchema={signupSchema}>
-        {({ errors }) => (
+      <Formik
+        initialValues={initialValues}
+        validationSchema={signupSchema}
+        onSubmit={formik.handleSubmit}
+      >
+        {({ }) => (
           <View style={styles.inputContainer}>
             {/* <View style={styles.inputIconContainer}>
               <Ionicons
@@ -105,10 +105,19 @@ const RegistrationScreen = ({ navigation }) => {
                 color="gray"
                 style={styles.inputIcon}
               />
-              <TextInput style={styles.input} placeholder="Email Address" />
+              <TextInput
+                style={styles.input}
+                placeholder="Email Address"
+                keyboardType="email-address"
+                autoCapitalize="none"
+                value={formik.values.email}
+                onChangeText={formik.handleChange("email")}
+                error={formik.touched.email && Boolean(formik.errors.email)}
+              />
             </View>
-            {errors.email && <Text style={styles.error}>{errors.email}</Text>}
-
+            {formik.errors.email && (
+              <Text style={styles.error}>{formik.errors.email}</Text>
+            )}
             {/* Password Input */}
             <View style={styles.inputIconContainer}>
               <Ionicons
@@ -121,12 +130,14 @@ const RegistrationScreen = ({ navigation }) => {
                 style={styles.input}
                 placeholder="Password"
                 secureTextEntry={showPassword}
+                value={formik.values.password}
+                onChangeText={formik.handleChange("password")}
               />
               <TouchableOpacity
                 onPress={toggleShowPassword}
                 style={styles.eyeButton}
               >
-                {password.length > 1 ? null : showPassword ? (
+                {formik.values.password.length > 1 ? null : showPassword ? (
                   <Ionicons
                     name="eye-off"
                     style={{ marginRight: 10 }}
@@ -143,12 +154,12 @@ const RegistrationScreen = ({ navigation }) => {
                 )}
               </TouchableOpacity>
             </View>
-            {errors.password && (
-              <Text style={styles.error}>{errors.password}</Text>
+            {formik.errors.password && (
+              <Text style={styles.error}>{formik.errors.password}</Text>
             )}
             <TouchableOpacity
               style={styles.signUpButton}
-              onPress={()=>handleSubmit()}
+              onPress={formik.handleSubmit}
             >
               <Text style={styles.buttonText}>Sign Up</Text>
             </TouchableOpacity>

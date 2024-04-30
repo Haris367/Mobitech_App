@@ -10,10 +10,48 @@ import {
   Platform,
   Image,
 } from "react-native";
+
+import AsyncStorage from "@react-native-async-storage/async-storage";
+import { Alert } from 'react-native';
+
 import { Ionicons } from "@expo/vector-icons";
 import  Card from "../components/Card";
+import colors from "../config/colors";
+
+
+
+
 
 const HomeScreen = ({ navigation }) => {
+
+  const logoutHandler = async () => {
+    Alert.alert(
+      'Confirm',
+      'Are you sure you want to logout?',
+      [
+        {
+          text: 'Cancel',
+          style: 'cancel',
+        },
+        {
+          text: 'Logout',
+          onPress: async () => {
+            try {
+              await AsyncStorage.removeItem('token');
+              console.log("logout succes");
+              // dispatch(userActions.logout());
+              navigation.navigate("WelcomeScreen");
+            } catch (error) {
+              console.error('Error occurred while logging out:', error);
+            }
+          },
+        },
+      ],
+      { cancelable: false }
+    );
+  };
+
+  
   return (
     <SafeAreaView style={styles.container}>
         {/* Header */}
@@ -23,7 +61,11 @@ const HomeScreen = ({ navigation }) => {
         </TouchableOpacity> */}
           <TouchableOpacity style={styles.avatarIcon} onPress={() => navigation.navigate("Details")}>
             {/* Replace 'user' with your actual icon name */}
-            <Ionicons name="person-circle" size={40} color="black" />
+            <Ionicons name="person-circle" size={30} color={colors.primary} />
+          </TouchableOpacity>
+          <TouchableOpacity style={styles.avatarIcon} onPress={logoutHandler}>
+            {/* Replace 'user' with your actual icon name */}
+            <Ionicons name="log-out-outline" size={30} color={colors.primary} />
           </TouchableOpacity>
         </View>
       <ScrollView verticle showsVerticalScrollIndicator={false} style={styles.container}>

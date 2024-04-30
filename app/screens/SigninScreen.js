@@ -1,6 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
-import { useDispatch } from "react-redux";
 import {
   View,
   Text,
@@ -9,9 +7,9 @@ import {
   StyleSheet,
   Platform,
   SafeAreaView,
+  Alert,
 } from "react-native";
-import { Formik, useFormik, validateYupSchema } from "formik";
-import * as Yup from "yup"; // Import Yup for validation
+import { Formik, useFormik } from "formik";
 
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../config/colors";
@@ -20,67 +18,33 @@ import { login } from "../services";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
 const SigninScreen = ({ navigation }) => {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
+  const initialValues = {
+    email: "",
+    password: "",
+  };
+  const formik = useFormik({
+    initialValues: initialValues,
+    validationSchema: loginSchema,
+    onSubmit: async (values) => {
+      try {
+        const { email, password } = values;
+        const response = await login({ email, password });
+        console.log("Login Success", response);
 
-  function handleSubmit() {
-    console.log(email, password);
-    const userData = {
-      email: email,
-      password,
-    };
-    axios
-      .post("http://localhost:5000/api/users/login", userData)
-      .then((res) => console.log(res.data))
-      .catch((e) => console.log(e));
-
-    // try{
-
-    //   const { email, password } = values;
-
-    //   const response = await login({
-    //     email,
-    //     password
-    //   }).then(() => {
-    //     if(response.status==200){
-    //       AsyncStorage.setItem("Access Token", response.data);
-    //       console.log("success")
-    //       navigation.navigate("Bottom Navigation");
-
-    //     }
-    //   })
-    // }
-    // catch (error){
-    //   console.log(error);
-    // }
-  }
-
-  // const handleLogin = async (values) => {
-
-  //   try {
-  //     const { email, password } = values;
-  //     const response = await login({ email, password });
-  //     // console.log("====================================");
-  //     console.log("response", response);
-  //     // console.log("====================================");
-  //     const { user, token } = response.data;
-
-  //     // Store token in AsyncStorage
-  //     await AsyncStorage.setItem("token", token);
-
-  //     // Dispatch action to Redux store (assuming you're using Redux)
-  //     const dispatch = useDispatch();
-  //     dispatch({ type: "LOGIN", payload: { id: user.userId, email } });
-  //     // ale;
-  //     // Navigate to dashboard screen
-  //     navigation.navigate("Bottom Navigation");
-  //   } catch (error) {
-  //     console.error(error);
-  //     // navigation.navigate("Bottom Navigation");
-
-  //     // Handle login failure
-  //   }
-  // };
+        const { user, token } = response.data;
+        await AsyncStorage.setItem("token", token);
+        // dispatch({ type: "LOGIN", payload: { id: user.userId, email } });
+        navigation.navigate("Bottom Navigation");
+      } catch (e) {
+        console.log(e?.response?.data || e.response?.data?.message);
+        Alert.alert('Error', 'Invalid email or password');
+        if (e.response?.status === 401) {
+          formik.errors.email = "Invalid email or password";
+          formik.errors.password = "Invalid email or password";
+        }
+      }
+    },
+  });
 
   const [showPassword, setShowPassword] = useState(false);
   const toggleShowPassword = () => {
@@ -98,10 +62,11 @@ const SigninScreen = ({ navigation }) => {
       <Text style={styles.title}>Login</Text>
 
       <Formik
-        // initialValues={initialValues}
+        initialValues={initialValues}
         validationSchema={loginSchema}
+        onSubmit={formik.handleSubmit}
       >
-        {({ errors }) => (
+        {({  }) => (
           <View style={styles.inputContainer}>
             <View style={styles.inputIconContainer}>
               <Ionicons
@@ -115,9 +80,14 @@ const SigninScreen = ({ navigation }) => {
                 placeholder="Email Address"
                 keyboardType="email-address"
                 autoCapitalize="none"
+                value={formik.values.email}
+                onChangeText={formik.handleChange("email")}
+                error={formik.touched.email && Boolean(formik.errors.email)}
               />
             </View>
-            {errors.email && <Text style={styles.error}>{errors.email}</Text>}
+            {formik.errors.email && (
+              <Text style={styles.error}>{formik.errors.email}</Text>
+            )}
             <View style={styles.inputIconContainer}>
               <Ionicons
                 name="lock-closed-outline"
@@ -128,22 +98,24 @@ const SigninScreen = ({ navigation }) => {
               <TextInput
                 style={styles.input}
                 placeholder="Password"
-                secureTextEntry={showPassword}
+                secureTextEntry={!showPassword}
+                value={formik.values.password}
+                onChangeText={formik.handleChange("password")}
               />
               <TouchableOpacity
                 onPress={toggleShowPassword}
                 style={styles.eyeButton}
               >
-                {password.length > 1 ? null : showPassword ? (
+                {formik.values.password.length < 1 ? null : showPassword ? (
                   <Ionicons
-                    name="eye-off"
+                    name="eye"
                     style={{ marginRight: 10 }}
                     size={20}
                     color={colors.primary}
                   />
                 ) : (
                   <Ionicons
-                    name="eye"
+                    name="eye-off"
                     size={20}
                     style={{ marginRight: 10 }}
                     color={colors.primary}
@@ -151,8 +123,8 @@ const SigninScreen = ({ navigation }) => {
                 )}
               </TouchableOpacity>
             </View>
-            {errors.password && (
-              <Text style={styles.error}>{errors.password}</Text>
+            {formik.errors.password && (
+              <Text style={styles.error}>{formik.errors.password}</Text>
             )}
             <View style={styles.row}>
               {/* <View style={styles.rememberMeContainer}>
@@ -177,10 +149,7 @@ const SigninScreen = ({ navigation }) => {
                 <Text style={styles.forgotPassword}>Forgot Password?</Text>
               </TouchableOpacity>
             </View>
-            <TouchableOpacity
-              style={styles.loginButton}
-              onPress={() => handleSubmit()}
-            >
+            <TouchableOpacity style={styles.loginButton} onPress={formik.handleSubmit}>
               <Text style={styles.buttonText}>Login</Text>
             </TouchableOpacity>
             <View style={styles.signUpTextContainer}>
