@@ -1,41 +1,93 @@
-import React from "react";
-import { View, Text, Image, StyleSheet, FlatList, Dimensions } from "react-native";
-
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  FlatList,
+  Dimensions,
+} from "react-native";
+import { getAllProducts } from "../services/products";
+import { useCallback } from "react";
 
 const { width, height } = Dimensions.get("window");
 const CARD_WIDTH = (width - 30) / 2; // Calculate the card width based on screen width
 const NAVIGATION_BAR_HEIGHT = 50; // Adjust this value based on your navigation bar's height
 
-
 const Card = () => {
+  const [productListing, setProductListing] = useState([]);
+
   // Data for the cards
   const data = [
-    { id: 1, title: "iPhone 15", description: "Karachi - used", price: "PKR 140,000", image: require("../../assets/card1.png") },
-    { id: 2, title: "iPhone 15", description: "Karachi - used", price: "PKR 140,000", image: require("../../assets/card2.png") },
-    { id: 3, title: "iPhone 15", description: "Karachi - used", price: "PKR 140,000", image: require("../../assets/card3.png") }
+    {
+      productId: 7,
+      image: require("../../assets/card1.png"),
+    },
+    {
+      productId: 8,
+      image: require("../../assets/card2.png"),
+    },
+    {
+      productId: 9,
+      image: require("../../assets/card3.png"),
+    },
   ];
 
+  // useEffect(() => {
+  //   const fetchProducts = async () => {
+  //     try {
+  //       const response = await getAllProducts();
+  //       console.log(response.data);
+  //       setProductListing(response.data);
+  //     } catch (error) {
+  //       console.log(error);
+  //     }
+  //   };
+
+  //   fetchProducts(); // Call the fetchProducts function when the component mounts
+  // }, []);
+
+  const fetchProducts = useCallback(async () => {
+    try {
+      const response = await getAllProducts();
+      console.log(response.data);
+      setProductListing(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchProducts();
+  }, [fetchProducts]);
   // Render item function for FlatList
-  const renderItem = ({ item }) => (
-    <View style={[styles.card, { width: CARD_WIDTH }]}>
-      <Image
-        source={item.image}
-        style={styles.image}
-        resizeMode="cover"
-      />
-      <View style={styles.textContainer}>
-        <Text style={styles.title}>{item.title}</Text>
-        <Text style={styles.description}>{item.description}</Text>
-        <Text style={styles.price}>{item.price}</Text>
+  const renderItem = ({ productListing, item }) => {
+    const imageData = data.find((dataItem) => dataItem.id === item.id); // Find the image data corresponding to the current item
+    console.log('item:', item);
+    console.log('imageData:', imageData);
+    return (
+      <View style={[styles.card, { width: CARD_WIDTH }]}>
+        <Image
+          source={imageData.image}
+          style={styles.image}
+          resizeMode="cover"
+        />
+        <View style={styles.textContainer}>
+          <Text style={styles.title}>{productListing.modelName}</Text>
+          <Text style={styles.description}>{productListing.description}</Text>
+          <Text style={styles.price}>
+            Rs.{productListing.price.toLocaleString()}
+          </Text>
+          {/* <Text style={styles.price}>{productListing.quantity}</Text> */}
+        </View>
       </View>
-    </View>
-  );
+    );
+  };
 
   return (
     <FlatList
-      data={data}
-      renderItem={renderItem}
-      keyExtractor={item => item.id.toString()}
+      data={productListing}
+      renderItem={({ item }) => renderItem({ productListing: item, item })} // keyExtractor={item => item.id.toString()}
       contentContainerStyle={styles.container}
       numColumns={2} // Set the number of columns to 2 for the grid layout
     />
@@ -47,7 +99,6 @@ const styles = StyleSheet.create({
     paddingVertical: 10,
     paddingHorizontal: 5,
     paddingBottom: NAVIGATION_BAR_HEIGHT, // Add padding to the bottom to accommodate the navigation bar
-
   },
   card: {
     flex: 0.5, // Ensure equal flex for each card to maintain grid layout

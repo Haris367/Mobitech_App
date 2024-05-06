@@ -4,36 +4,45 @@ import {
   View,
   SafeAreaView,
   TextInput,
+  Platform,
   TouchableOpacity,
-  Button,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 
 import React from "react";
 import colors from "../config/colors";
+import style from "../config/style";
 
 const Profile = ({ navigation }) => {
   return (
-    <SafeAreaView style={styles.header}>
+    <SafeAreaView style={style.header}>
+      <View style={{ flexDirection: "row" }}>
+        <TouchableOpacity
+          style={{ left: 10, top: 10 }}
+          onPress={() => navigation.goBack()}
+        >
+          <Ionicons name="arrow-back" size={20} color={colors.white} />
+        </TouchableOpacity>
+        <Text
+          style={{
+            ...Platform.select({
+              ios: {
+                top: 10,
+              },
+              android: {
+                top: 0,
+              },
+            }),
+            left: 50,
+            color: colors.white,
+            fontSize: 18,
+            fontWeight: "bold",
+          }}
+        >
+          My Profile
+        </Text>
+      </View>
       <View style={styles.container}>
-        <View style={{ flexDirection: "row" }}>
-          <TouchableOpacity
-            style={{ left: 10 }}
-            onPress={() => navigation.goBack()}
-          >
-            <Ionicons name="arrow-back" size={20} color={colors.white} />
-          </TouchableOpacity>
-          <Text
-            style={{
-              left: 60,
-              color: colors.white,
-              fontSize: 18,
-              fontWeight: "bold",
-            }}
-          >
-            My Profile
-          </Text>
-        </View>
         <View style={styles.iconContainer}>
           <Ionicons
             name="person-outline"
@@ -46,20 +55,7 @@ const Profile = ({ navigation }) => {
           </Text>
         </View>
         <TextInput editable style={styles.input} placeholder="Full Name" />
-        <View style={styles.iconContainer}>
-          <Ionicons
-            name="location-outline"
-            size={20}
-            color="gray"
-            style={styles.inputIcon}
-          />
-          <Text style={{ fontWeight: "500", fontSize: 15 }}>Your Location</Text>
-        </View>
-        <TextInput
-          editable
-          style={styles.input}
-          placeholder="Enter Your City"
-        />
+
         <View style={styles.iconContainer}>
           <Ionicons
             name="mail-outline"
@@ -76,7 +72,7 @@ const Profile = ({ navigation }) => {
         />
 
         <TouchableOpacity
-          style={styles.registerButton}
+          style={styles.saveButton}
           onPress={() => alert("Changes Saved")}
         >
           <Text style={[styles.buttonText, { color: colors.white }]}>
@@ -91,16 +87,26 @@ const Profile = ({ navigation }) => {
 export default Profile;
 
 const styles = StyleSheet.create({
-  header: {
-    backgroundColor: colors.primary,
-    width: "100%",
-    height: "10%",
-    paddingTop: 50,
+  container: {
+    top: 70,
   },
+  // header: {
+  //   backgroundColor: colors.primary,
+  //   width: "100%",
+  //   height: "10%",
+  //   ...Platform.select({
+  //     ios: {
+  //       padding: 60,
+  //     },
+  //     android: {
+  //       padding: 50,
+  //     },
+  //   }),
+  // },
 
   iconContainer: {
     flexDirection: "row",
-    marginTop: 50,
+    marginTop: 40,
     left: 20,
   },
   input: {
@@ -113,7 +119,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     marginTop: 10,
   },
-  registerButton: {
+  saveButton: {
     width: "70%",
     height: 50,
     borderRadius: 15,
@@ -121,6 +127,6 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "center",
     marginTop: 70,
-    left:55,
+    left: 55,
   },
 });

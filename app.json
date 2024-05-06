@@ -5,6 +5,11 @@
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./app/assets/mobitechLogo.png",
+    "splash": {
+      "image": "./assets/mobitechLogo.png",
+      "resizeMode": "cover",
+      "backgroundColor":"#FF5A60"
+    },
     "userInterfaceStyle": "light",
     "assetBundlePatterns": [
       "**/*"

@@ -1,10 +1,17 @@
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import React, { useState } from "react";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
-import { HomeScreen, Sell, UserDetails } from "../screens";
+import {
+  AdPostScreen,
+  HomeScreen,
+  Profile,
+  Sell,
+  UserDetails,
+} from "../screens";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../config/colors";
 import MyAds from "../screens/MyAds";
+import { StackNav } from "../../App";
 
 const Tab = createBottomTabNavigator();
 
@@ -46,12 +53,13 @@ const CustomTabBarButton = ({ children, onPress }) => (
   </TouchableOpacity>
 );
 
-const BottomTabNavigation = () => {
+const TabNav = () => {
   return (
     <Tab.Navigator screenOptions={screenOptions}>
+     
       <Tab.Screen
         name="Home"
-        component={HomeScreen}
+        component={StackNav}
         options={{
           tabBarIcon: ({ focused }) => {
             return (
@@ -77,7 +85,7 @@ const BottomTabNavigation = () => {
               />
             );
           },
-          tabBarButton: (props) => <CustomTabBarButton {...props} />,
+          tabBarButton: (props) => <CustomTabBarButton {...props} />
         }}
       />
       <Tab.Screen
@@ -93,6 +101,22 @@ const BottomTabNavigation = () => {
               />
             );
           },
+        }}
+      />
+
+      <Tab.Screen
+        name="Profile"
+        component={StackNav}
+        options={{ tabBarButton: () => null }}
+      />
+      <Tab.Screen
+        name="Sell Your Phone"
+        component={AdPostScreen}
+        options={{
+          tabBarButton: () => null,
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.white,
         }}
       />
     </Tab.Navigator>
@@ -112,4 +136,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default BottomTabNavigation;
+export default TabNav;

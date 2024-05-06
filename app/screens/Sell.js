@@ -9,14 +9,14 @@ import {
 import React from "react";
 import colors from "../config/colors";
 
-const Sell = ({navigation}) => {
+const Sell = ({ navigation }) => {
   return (
     <SafeAreaView>
       <Text style={styles.headingText}>
         How do you want to sell your phone?
       </Text>
       <View style={styles.boxContainer}>
-        <TouchableOpacity onPress={()=>navigation.navigate("")}>
+        <TouchableOpacity onPress={() => navigation.navigate("AdPost")}>
           <View style={styles.box}>
             <Text style={styles.boxHeadingText}>Sell it for me!</Text>
             <Text style={styles.boxText}>
@@ -27,14 +27,16 @@ const Sell = ({navigation}) => {
             </Text>
           </View>
         </TouchableOpacity>
-        <TouchableOpacity onPress={()=>navigation.navigate("")}>
+        <TouchableOpacity
+          onPress={() => navigation.navigate("Sell Your Phone")}
+        >
           <View style={styles.box}>
-            <Text style={styles.boxHeadingText}>Sell it myself!</Text>
+            <Text style={styles.boxHeadingText}>Sell Today!</Text>
             <Text style={styles.boxText}>
-              Have a phone to sell but no time to bargain best offers?
+              Post your Ad to find the best offer from our verified buyers
             </Text>
             <Text style={[styles.boxText, { color: "#f53131" }]}>
-              I can find the best offers{" "}
+              Post an Ad right away
             </Text>
           </View>
         </TouchableOpacity>
@@ -73,7 +75,7 @@ const styles = StyleSheet.create({
     fontSize: 20,
     fontWeight: "500",
     left: 10,
-    color: colors.primary,
+    color: colors.black,
   },
   boxText: {
     left: 10,

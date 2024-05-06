@@ -9,40 +9,42 @@ import {
   ScrollView,
   Platform,
   Image,
+  BackHandler,
 } from "react-native";
 
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import { Alert } from 'react-native';
+import { Alert } from "react-native";
 
 import { Ionicons } from "@expo/vector-icons";
-import  Card from "../components/Card";
+import Card from "../components/Card";
 import colors from "../config/colors";
+import StackNavigator from "../navigation/StackNavigator";
+import { useEffect } from "react";
 
-
-
-
+import { useFocusEffect } from "@react-navigation/native";
 
 const HomeScreen = ({ navigation }) => {
-
   const logoutHandler = async () => {
+    AsyncStorage.setItem("isLoggedIn", "");
+    AsyncStorage.setItem("token", "");
     Alert.alert(
-      'Confirm',
-      'Are you sure you want to logout?',
+      "Confirm",
+      "Are you sure you want to logout?",
       [
         {
-          text: 'Cancel',
-          style: 'cancel',
+          text: "Cancel",
+          style: "cancel",
         },
         {
-          text: 'Logout',
+          text: "Logout",
           onPress: async () => {
             try {
-              await AsyncStorage.removeItem('token');
-              console.log("logout succes");
+              await AsyncStorage.removeItem("token");
               // dispatch(userActions.logout());
               navigation.navigate("WelcomeScreen");
+              console.log("logout succes");
             } catch (error) {
-              console.error('Error occurred while logging out:', error);
+              console.error("Error occurred while logging out:", error);
             }
           },
         },
@@ -51,25 +53,55 @@ const HomeScreen = ({ navigation }) => {
     );
   };
 
-  
+  const handleBackPress = () => {
+    Alert.alert("Exit App", "Are you sure you want to exit?", [
+      {
+        text: "Cancel",
+        onPress: () => null,
+        style: "cancel",
+      },
+      {
+        text: "Exit",
+        onPress: () => BackHandler.exitApp(),
+      },
+    ]);
+    return true;
+  };
+
+  useFocusEffect(
+    React.useCallback(() => {
+      BackHandler.addEventListener("hardwareBackPress", handleBackPress);
+
+      return () => {
+        BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
+      };
+    }),
+  );
+
   return (
     <SafeAreaView style={styles.container}>
-        {/* Header */}
-        <View style={styles.header}>
-          {/* <TouchableOpacity style={styles.filterIcon}>
+      {/* Header */}
+      <View style={styles.header}>
+        {/* <TouchableOpacity style={styles.filterIcon}>
           <Ionicons name="filter" size={25} color="black" />
         </TouchableOpacity> */}
-          <TouchableOpacity style={styles.avatarIcon} onPress={() => navigation.navigate("Details")}>
-            {/* Replace 'user' with your actual icon name */}
-            <Ionicons name="person-circle" size={30} color={colors.primary} />
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.avatarIcon} onPress={logoutHandler}>
-            {/* Replace 'user' with your actual icon name */}
-            <Ionicons name="log-out-outline" size={30} color={colors.primary} />
-          </TouchableOpacity>
-        </View>
-      <ScrollView verticle showsVerticalScrollIndicator={false} style={styles.container}>
-
+        <TouchableOpacity
+          style={styles.avatarIcon}
+          onPress={() => navigation.navigate("Details")}
+        >
+          {/* Replace 'user' with your actual icon name */}
+          <Ionicons name="person-circle" size={30} color={colors.primary} />
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.avatarIcon} onPress={logoutHandler}>
+          {/* Replace 'user' with your actual icon name */}
+          <Ionicons name="log-out-outline" size={30} color={colors.primary} />
+        </TouchableOpacity>
+      </View>
+      <ScrollView
+        verticle
+        showsVerticalScrollIndicator={false}
+        style={styles.container}
+      >
         {/* Welcome Text */}
         <Text style={styles.welcomeText}>Welcome,</Text>
         <Text style={styles.welcomeText2}>To MobiTech App</Text>
@@ -110,8 +142,10 @@ const HomeScreen = ({ navigation }) => {
             />
           </View>
         </ScrollView>
-        <Text style={{fontSize:20,left:15,paddingTop:20}}>Featured Phones</Text>
-        <Card/>
+        <Text style={{ fontSize: 20, left: 15, paddingTop: 20 }}>
+          Featured Phones
+        </Text>
+        <Card />
       </ScrollView>
     </SafeAreaView>
   );
@@ -128,20 +162,21 @@ const styles = StyleSheet.create({
       android: {
         paddingHorizontal: 30,
       },
-    }),  },
+    }),
+  },
   header: {
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
     marginBottom: "3%",
-    marginLeft:"3%"
+    marginLeft: "3%",
   },
   filterIcon: {
     padding: 10,
   },
   avatarIcon: {
     padding: 10,
-    paddingLeft:1,
+    paddingLeft: 1,
   },
   welcomeText: {
     fontSize: 35,

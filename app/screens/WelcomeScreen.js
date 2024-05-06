@@ -21,7 +21,7 @@ function WelcomeScreen({ navigation }) {
         <Text style={styles.text}>The Best Market For Your Phones</Text>
       </View>
       <TouchableOpacity
-        style={[styles.registerButton, {top:500}]}
+        style={[styles.registerButton, { top: 500 }]}
         onPress={() => navigation.navigate("Register")}
       >
         <Text style={[styles.buttonText, { color: colors.primary }]}>

@@ -7,6 +7,10 @@ import {
   TouchableOpacity,
   StyleSheet,
   SafeAreaView,
+  KeyboardAvoidingView,
+  ScrollView,
+  Platform,
+  Alert,
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../config/colors";
@@ -15,33 +19,49 @@ import { signupSchema } from "../validations/validations";
 import { signup } from "../services";
 
 const RegistrationScreen = ({ navigation }) => {
-  const initialValues = {
-    email: "",
-    password: "",
-  };
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  // function handleSubmit() {
+  //   const userData = {
+  //     email: email,
+  //     name: name,
+  //     password: password,
+  //   };
+  //   axios
+  //     .post("http://192.168.0.101:5000/api/users/signup", userData)
+  //     .then((res) => console.log(res.data))
+  //     .catch((e) => console.log(e));
+  // }
   const formik = useFormik({
-    initialValues: initialValues,
+    initialValues: {
+      name: "",
+      email: "",
+      password: "",
+    },
     validationSchema: signupSchema,
     onSubmit: async (values) => {
-      try {
-        const { email, password } = values;
-        const response = await signup({ email, password });
-        console.log("response", response);
-
-        const { user, token } = response.data;
-        await AsyncStorage.setItem("token", token);
-        // dispatch({ type: "LOGIN", payload: { id: user.userId, email } });
-        navigation.navigate("Signin");
-      } catch (e) {
-        console.log(e?.response?.data || e.response?.data?.message);
-        if (e.response?.status === 401) {
-          formik.errors.email = "Invalid email or password";
-          formik.errors.password = "Invalid email or password";
-        }
-      }
+      signupHandler(values);
+      console.log(values);
     },
   });
 
+  const signupHandler = async (data) => {
+    try {
+      const { name, email, password } = data;
+      // const user = { name, email, password };
+
+      const response = await signup({ name, email, password });
+        console.log("signup Success", response);
+      Alert.alert("Succesfully Signed up");
+      navigation.navigate("Signin");
+    } catch (e) {
+      console.clear();
+      Alert.alert("User already exist");
+      // const error = e.response.data.message.split('"')[1];
+    }
+  };
   const [showPassword, setShowPassword] = useState(false);
 
   const toggleShowPassword = () => {
@@ -51,134 +71,117 @@ const RegistrationScreen = ({ navigation }) => {
   return (
     <SafeAreaView style={styles.container}>
       <Text style={styles.title}>Sign Up</Text>
-      <Formik
-        initialValues={initialValues}
-        validationSchema={signupSchema}
-        onSubmit={formik.handleSubmit}
+      <KeyboardAvoidingView
+        style={[styles.inputContainer, { flex: 1 }]}
+        behavior={Platform.OS === "ios" ? "padding" : null}
       >
-        {({ }) => (
-          <View style={styles.inputContainer}>
-            {/* <View style={styles.inputIconContainer}>
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color="gray"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="First Name"
-                onChangeText={handleChange("firstName")}
-                onBlur={handleBlur("firstName")}
-                value={values.firstName}
-              />
-            </View>
-            {errors.firstName && (
-              <Text style={styles.error}>{errors.firstName}</Text>
-            )}
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }}
+          showsVerticalScrollIndicator={false}
+        >
+          <Formik onSubmit={formik.handleSubmit}>
+            <View>
+              <View style={styles.inputIconContainer}>
+                <Ionicons
+                  name="person-outline"
+                  size={20}
+                  color="gray"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Name"
+                  onChangeText={formik.handleChange("name")}
+                  value={formik.values.name}
+                />
+              </View>
+              {formik.touched.name && formik.errors.name && (
+                <Text style={styles.error}>{formik.errors.name}</Text>
+              )}
 
-            {/* Last Name Input */}
-            {/* <View style={styles.inputIconContainer}>
-              <Ionicons
-                name="person-outline"
-                size={20}
-                color="gray"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Last Name"
-                onChangeText={handleChange("lastName")}
-                onBlur={handleBlur("lastName")}
-                value={values.lastName}
-              />
-            </View>
-            {errors.lastName && (
-              <Text style={styles.error}>{errors.lastName}</Text>
-            )} */}
-
-            {/* Email Input */}
-            <View style={styles.inputIconContainer}>
-              <Ionicons
-                name="mail-outline"
-                size={20}
-                color="gray"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Email Address"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                value={formik.values.email}
-                onChangeText={formik.handleChange("email")}
-                error={formik.touched.email && Boolean(formik.errors.email)}
-              />
-            </View>
-            {formik.errors.email && (
-              <Text style={styles.error}>{formik.errors.email}</Text>
-            )}
-            {/* Password Input */}
-            <View style={styles.inputIconContainer}>
-              <Ionicons
-                name="lock-closed-outline"
-                size={20}
-                color="gray"
-                style={styles.inputIcon}
-              />
-              <TextInput
-                style={styles.input}
-                placeholder="Password"
-                secureTextEntry={showPassword}
-                value={formik.values.password}
-                onChangeText={formik.handleChange("password")}
-              />
+              {/* Email Input */}
+              <View style={styles.inputIconContainer}>
+                <Ionicons
+                  name="mail-outline"
+                  size={20}
+                  color="gray"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Email Address"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  value={formik.values.email}
+                  onChangeText={formik.handleChange("email")}
+                  error={formik.touched.email && Boolean(formik.errors.email)}
+                />
+              </View>
+              {formik.touched.email && formik.errors.email && (
+                <Text style={styles.error}>{formik.errors.email}</Text>
+              )}
+              {/* Password Input */}
+              <View style={styles.inputIconContainer}>
+                <Ionicons
+                  name="lock-closed-outline"
+                  size={20}
+                  color="gray"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Password"
+                  secureTextEntry={showPassword}
+                  value={formik.values.password}
+                  onChangeText={formik.handleChange("password")}
+                />
+                <TouchableOpacity
+                  onPress={toggleShowPassword}
+                  style={styles.eyeButton}
+                >
+                  {password.length > 1 ? null : showPassword ? (
+                    <Ionicons
+                      name="eye-off"
+                      style={{ marginRight: 10 }}
+                      size={20}
+                      color={colors.primary}
+                    />
+                  ) : (
+                    <Ionicons
+                      name="eye"
+                      size={20}
+                      style={{ marginRight: 10 }}
+                      color={colors.primary}
+                    />
+                  )}
+                </TouchableOpacity>
+              </View>
+              {formik.touched.password && formik.errors.password && (
+                <Text style={styles.error}>{formik.errors.password}</Text>
+              )}
               <TouchableOpacity
-                onPress={toggleShowPassword}
-                style={styles.eyeButton}
+                style={styles.signUpButton}
+                onPress={formik.handleSubmit}
               >
-                {formik.values.password.length > 1 ? null : showPassword ? (
-                  <Ionicons
-                    name="eye-off"
-                    style={{ marginRight: 10 }}
-                    size={20}
-                    color={colors.primary}
-                  />
-                ) : (
-                  <Ionicons
-                    name="eye"
-                    size={20}
-                    style={{ marginRight: 10 }}
-                    color={colors.primary}
-                  />
-                )}
+                <Text style={styles.buttonText}>Sign Up</Text>
               </TouchableOpacity>
             </View>
-            {formik.errors.password && (
-              <Text style={styles.error}>{formik.errors.password}</Text>
-            )}
-            <TouchableOpacity
-              style={styles.signUpButton}
-              onPress={formik.handleSubmit}
-            >
-              <Text style={styles.buttonText}>Sign Up</Text>
+          </Formik>
+          <View style={styles.horizontalLineContainer}>
+            <View style={styles.horizontalLine} />
+            <Text style={styles.orText}>Or continue with</Text>
+            <View style={styles.horizontalLine} />
+          </View>
+          <View style={styles.iconContainer}>
+            <TouchableOpacity style={styles.icon}>
+              <Ionicons name="logo-google" size={40} color="red" />
+            </TouchableOpacity>
+            <TouchableOpacity style={styles.icon}>
+              <Ionicons name="logo-facebook" size={40} color="blue" />
             </TouchableOpacity>
           </View>
-        )}
-      </Formik>
-      <View style={styles.horizontalLineContainer}>
-        <View style={styles.horizontalLine} />
-        <Text style={styles.orText}>Or continue with</Text>
-        <View style={styles.horizontalLine} />
-      </View>
-      <View style={styles.iconContainer}>
-        <TouchableOpacity style={styles.icon}>
-          <Ionicons name="logo-google" size={40} color="red" />
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.icon}>
-          <Ionicons name="logo-facebook" size={40} color="blue" />
-        </TouchableOpacity>
-      </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     </SafeAreaView>
   );
 };
@@ -200,7 +203,8 @@ const styles = StyleSheet.create({
   },
   inputContainer: {
     width: "90%",
-    marginBottom: 20,
+    // marginBottom: 20,
+    top: "25%",
   },
   inputIconContainer: {
     flexDirection: "row",
