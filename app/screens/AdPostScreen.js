@@ -88,7 +88,7 @@ export default function AdPostScreen({ navigation }) {
               <View>
 
 
-            <TouchableOpacity style={styles.imageButton} onPress={handleImage}>
+            <TouchableOpacity style={styles.imageButton}>
               <Text style={{ fontSize: 20, color: colors.white }}>
                 +Upload Image
               </Text>
@@ -131,8 +131,6 @@ export default function AdPostScreen({ navigation }) {
               Add Product
             </Text>
           </TouchableOpacity>
-          <View></View>
-          <View></View>
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

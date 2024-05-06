@@ -12,6 +12,7 @@ import { Ionicons } from "@expo/vector-icons";
 import colors from "../config/colors";
 import MyAds from "../screens/MyAds";
 import { StackNav } from "../../App";
+import SellForMeScreen from "../screens/sellForMeScreen";
 
 const Tab = createBottomTabNavigator();
 
@@ -112,6 +113,16 @@ const TabNav = () => {
       <Tab.Screen
         name="Sell Your Phone"
         component={AdPostScreen}
+        options={{
+          tabBarButton: () => null,
+          headerShown: true,
+          headerStyle: { backgroundColor: colors.primary },
+          headerTintColor: colors.white,
+        }}
+      />
+      <Tab.Screen
+        name="Sell For Me"
+        component={SellForMeScreen}
         options={{
           tabBarButton: () => null,
           headerShown: true,

@@ -16,7 +16,7 @@ const Sell = ({ navigation }) => {
         How do you want to sell your phone?
       </Text>
       <View style={styles.boxContainer}>
-        <TouchableOpacity onPress={() => navigation.navigate("AdPost")}>
+        <TouchableOpacity onPress={() => navigation.navigate("Sell For Me")}>
           <View style={styles.box}>
             <Text style={styles.boxHeadingText}>Sell it for me!</Text>
             <Text style={styles.boxText}>

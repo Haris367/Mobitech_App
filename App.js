@@ -20,6 +20,7 @@ import {
 import AppNavigation from "./app/navigation/NavigationContainer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TabNav from "./app/navigation/BottomTabNavigation";
+import SellForMeScreen from "./app/screens/sellForMeScreen";
 
 
 // const Stack = createNativeStackNavigator();
@@ -63,6 +64,7 @@ export const StackNav = () => {
       {/* <Stack.Screen name="Details" component={TabNav}/> */}
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="Sell Your Phone" component={AdPostScreen} />
+      <Stack.Screen name="Sell For Me" component={SellForMeScreen} />
     </Stack.Navigator>
   );
 };
