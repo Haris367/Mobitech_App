@@ -6,13 +6,13 @@ import {
   HomeScreen,
   Profile,
   Sell,
+  SellForMeScreen,
   UserDetails,
 } from "../screens";
 import { Ionicons } from "@expo/vector-icons";
 import colors from "../config/colors";
 import MyAds from "../screens/MyAds";
 import { StackNav } from "../../App";
-import SellForMeScreen from "../screens/sellForMeScreen";
 
 const Tab = createBottomTabNavigator();
 

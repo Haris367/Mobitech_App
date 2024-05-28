@@ -15,13 +15,12 @@ import {
   Sell,
   SigninScreen,
   UserDetails,
+  SellForMeScreen,
   WelcomeScreen,
 } from "./app/screens";
 import AppNavigation from "./app/navigation/NavigationContainer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
 import TabNav from "./app/navigation/BottomTabNavigation";
-import SellForMeScreen from "./app/screens/sellForMeScreen";
-
 
 // const Stack = createNativeStackNavigator();
 

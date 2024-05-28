@@ -6,6 +6,7 @@ import UserDetails from "./UserDetails";
 import Profile from "./Profile";
 import Sell from "./Sell";
 import AdPostScreen from "./AdPostScreen";
+import SellForMeScreen from "./SellForMeScreen";
 
-export { HomeScreen, RegistrationScreen, SigninScreen, WelcomeScreen, UserDetails, Profile, Sell, AdPostScreen};
+export { HomeScreen, RegistrationScreen, SigninScreen, WelcomeScreen, UserDetails, Profile, Sell, AdPostScreen, SellForMeScreen};
 

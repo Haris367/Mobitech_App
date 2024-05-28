@@ -127,7 +127,7 @@ export default function AdPostScreen({ navigation }) {
             style={styles.saveButton}
             onPress={formik.handleSubmit}
             >
-            <Text style={[styles.buttonText, { color: colors.white }]}>
+            <Text style={{ color: colors.white }}>
               Add Product
             </Text>
           </TouchableOpacity>
