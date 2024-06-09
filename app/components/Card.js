@@ -13,12 +13,14 @@ import {
 import { getAllProducts, getUserProducts } from "../services/products";
 import { useCallback } from "react";
 import colors from "../config/colors";
+import { Linking } from "react-native";
+import Icon from "react-native-vector-icons/FontAwesome";
 
 const { width, height } = Dimensions.get("window");
 const CARD_WIDTH = (width - 30) / 2; // Calculate the card width based on screen width
 const NAVIGATION_BAR_HEIGHT = 50; // Adjust this value based on your navigation bar's height
 
-const Card = ({ userId }) => {
+const Card = ({ userId, isLoggedIn, product }) => {
   const [productListing, setProductListing] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -83,20 +85,38 @@ const Card = ({ userId }) => {
     setSelectedProduct(product);
     setIsModalVisible(true);
   };
-
+  // Add other images as needed
   const renderItem = ({ productListing, item }) => {
     const imageData = data.find((dataItem) => dataItem.id === item.id); // Find the image data corresponding to the current item
     console.log("item:", item);
     console.log("imageData:", imageData);
+    const imageUri = productListing.imageUri;
+    // const imageSource = images[imageUri]; // Ensure this matches your mapping
+    // const imageSource = require('../../../Backend/uploads/image-1717960701649-963340563.png')
+    // const backendUrl = "http://localhost:5000 "; // Your backend URL
+    // let fullImageUri;
+    // if (imageUri) {
+    //   fullImageUri = `${backendUrl}/${imageUri.replace(
+    //     "../../../Backend/",
+    //     ""
+    //   )}`;
+    // } else {
+    //   fullImageUri = ""; // Or set a placeholder image URL if needed
+    // }
     return (
       <View style={[styles.card, { width: CARD_WIDTH }]}>
+          <View style={styles.iconContainer}>
+            <Icon name="star-o" size={30} color="#FFD700" />
+          </View>
         <TouchableOpacity onPress={() => handleCardPress(productListing)}>
           <Image
-            source={imageData.image}
+            source={{uri: imageUri}}
             style={styles.image}
             resizeMode="cover"
+            onError={(error) => console.log("Image load error:", error)}
           />
           <View style={styles.textContainer}>
+            <Text style={styles.title}>{imageUri}</Text>
             <Text style={styles.title}>{productListing.modelName}</Text>
             <Text style={styles.description}>{productListing.description}</Text>
             <Text style={styles.price}>
@@ -107,6 +127,31 @@ const Card = ({ userId }) => {
         </TouchableOpacity>
       </View>
     );
+  };
+  const handleCallSeller = () => {
+    // Check if selectedProduct has a phone number property
+    if (selectedProduct?.User.contactNumber) {
+      const phoneNumber = selectedProduct.User.contactNumber;
+      const phoneUrl = `tel:${phoneNumber}`;
+      // Open the phone app with the provided phone number
+      Linking.openURL(phoneUrl);
+    } else {
+      // Handle case where phone number is not available
+      alert("Phone number not available");
+    }
+  };
+
+  const handleSendSMS = () => {
+    // Check if selectedProduct has a phone number property
+    if (selectedProduct?.User.contactNumber) {
+      const phoneNumber = selectedProduct.User.contactNumber;
+      const smsUrl = `sms:${phoneNumber}`;
+      // Open the SMS app with the provided phone number
+      Linking.openURL(smsUrl);
+    } else {
+      // Handle case where phone number is not available
+      alert("Phone number not available");
+    }
   };
 
   return (
@@ -128,6 +173,8 @@ const Card = ({ userId }) => {
             <Text style={styles.modalTitle}>{selectedProduct?.modelName}</Text>
             <Text>{selectedProduct?.description}</Text>
             <Text>Price: Rs.{selectedProduct?.price.toLocaleString()}</Text>
+            <Button title="Call Seller" onPress={handleCallSeller} />
+            <Button title="Send SMS" onPress={handleSendSMS} />
             {/* Add more product details here */}
             <Button title="Close" onPress={() => setIsModalVisible(false)} />
           </View>
@@ -200,6 +247,12 @@ const styles = StyleSheet.create({
     fontSize: 18,
     color: "gray",
     marginTop: 20,
+  },
+  iconContainer: {
+    position: "absolute",
+    top: 10,
+    right: 10,
+    zIndex: 1,
   },
 });
 

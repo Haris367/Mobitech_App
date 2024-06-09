@@ -187,7 +187,7 @@ const RegistrationScreen = ({ navigation }) => {
               </TouchableOpacity>
             </View>
           </Formik>
-          <View style={styles.horizontalLineContainer}>
+          {/* <View style={styles.horizontalLineContainer}>
             <View style={styles.horizontalLine} />
             <Text style={styles.orText}>Or continue with</Text>
             <View style={styles.horizontalLine} />
@@ -199,7 +199,7 @@ const RegistrationScreen = ({ navigation }) => {
             <TouchableOpacity style={styles.icon}>
               <Ionicons name="logo-facebook" size={40} color="blue" />
             </TouchableOpacity>
-          </View>
+          </View> */}
         </ScrollView>
       </KeyboardAvoidingView>
     </SafeAreaView>

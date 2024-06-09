@@ -122,18 +122,21 @@ const HomeScreen = ({ navigation }) => {
         {/* Welcome Text */}
         <Text style={styles.welcomeText}>Welcome,</Text>
         <Text style={styles.welcomeText2}>To MobiTech App</Text>
-
         {/* Search Bar */}
         <View style={styles.iconContainer}>
           <View style={styles.searchContainer}>
             <TouchableOpacity style={styles.searchIcon} onPress={handleSearch}>
               <Ionicons name="search" size={25} color="#666666" />
             </TouchableOpacity>
-            <TextInput style={styles.input} placeholder="Search..." value={searchQuery} onChange={(e)=> setSearchQuery(e.target.value)}/>
+            <TextInput
+              style={styles.input}
+              placeholder="Search..."
+              value={searchQuery}
+              onChangeText={setSearchQuery}
+              />
           </View>
           <Ionicons name="filter-circle-sharp" size={40}></Ionicons>
         </View>
-
         <ScrollView
           horizontal
           showsHorizontalScrollIndicator={false}
@@ -162,7 +165,9 @@ const HomeScreen = ({ navigation }) => {
         <Text style={{ fontSize: 20, left: 15, paddingTop: 20 }}>
           Featured Phones
         </Text>
-        <Card />
+        {productListing.map((product, index) => (
+          <Card key={index} product={product} />
+        ))}
       </ScrollView>
     </SafeAreaView>
   );

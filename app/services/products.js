@@ -1,9 +1,8 @@
 import api from "./api";
 
 export const getAllProducts = (userId) => {
-  // return api.get("/products/all");
-  const endpoint = userId ? `/products/user/${userId}` : "/products/all";
-  return api.get(endpoint);
+  return api.get("/products/all");
+ 
 };
 
 export const getProductById = (productId) => {

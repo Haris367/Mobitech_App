@@ -44,9 +44,19 @@ const UserDetails = ({ navigation }) => {
             },
           ]}
         >
-          {userData.name}
+          Profile: {userData.name}
         </Text>
-        <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
+        <Text
+          style={[
+            styles.text,
+            {
+              fontSize: 20,
+            },
+          ]}
+        >
+         Mobile: {userData.contactNumber}
+        </Text>
+        {/* <TouchableOpacity onPress={() => navigation.navigate("Profile")}>
           <Text style={[styles.text, { fontSize: 15 }]}>
             View Profile
             <Ionicons
@@ -56,7 +66,7 @@ const UserDetails = ({ navigation }) => {
               style={styles.arrowIcon}
             />
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
       <View style={styles.pageButton}>
         <TouchableOpacity
@@ -115,7 +125,7 @@ const styles = StyleSheet.create({
   },
 
   pageButton: {
-    top: "40%",
+    top: "100%",
   },
 
   productButton: {
@@ -126,7 +136,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignItems: "flex-start",
     // alignContent:"center",
-    marginTop: 70,
+    // marginTop: 90,
     left: "5%",
   },
 });
