@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -22,8 +22,12 @@ import StackNavigator from "../navigation/StackNavigator";
 import { useEffect } from "react";
 
 import { useFocusEffect } from "@react-navigation/native";
+import { getProductsByName } from "../services/products";
 
 const HomeScreen = ({ navigation }) => {
+  const [productListing, setProductListing] = useState([]);
+  const [searchQuery, setSearchQuery] = useState("");
+
   const logoutHandler = async () => {
     AsyncStorage.setItem("isLoggedIn", "");
     AsyncStorage.setItem("token", "");
@@ -75,8 +79,21 @@ const HomeScreen = ({ navigation }) => {
       return () => {
         BackHandler.removeEventListener("hardwareBackPress", handleBackPress);
       };
-    }),
+    })
   );
+
+  const handleSearch = async () => {
+    try {
+      const response = await getProductsByName(searchQuery);
+      console.log(response.data);
+      // Update the productListing state with the search result
+      setProductListing([response.data]);
+    } catch (error) {
+      alert("Searched Product Not found");
+      console.log("Product not found", error);
+      // Handle error, e.g., show a message to the user
+    }
+  };
 
   return (
     <SafeAreaView style={styles.container}>
@@ -109,10 +126,10 @@ const HomeScreen = ({ navigation }) => {
         {/* Search Bar */}
         <View style={styles.iconContainer}>
           <View style={styles.searchContainer}>
-            <TouchableOpacity style={styles.searchIcon}>
+            <TouchableOpacity style={styles.searchIcon} onPress={handleSearch}>
               <Ionicons name="search" size={25} color="#666666" />
             </TouchableOpacity>
-            <TextInput style={styles.input} placeholder="Search..." />
+            <TextInput style={styles.input} placeholder="Search..." value={searchQuery} onChange={(e)=> setSearchQuery(e.target.value)}/>
           </View>
           <Ionicons name="filter-circle-sharp" size={40}></Ionicons>
         </View>

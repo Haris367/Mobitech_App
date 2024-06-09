@@ -1,15 +1,10 @@
 {
   "expo": {
-    "name": "reactprac",
-    "slug": "reactprac",
+    "name": "MobiTech",
+    "slug": "MobiTech",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./app/assets/mobitechLogo.png",
-    "splash": {
-      "image": "./assets/mobitechLogo.png",
-      "resizeMode": "cover",
-      "backgroundColor":"#FF5A60"
-    },
+    "icon": "",
     "userInterfaceStyle": "light",
     "assetBundlePatterns": [
       "**/*"

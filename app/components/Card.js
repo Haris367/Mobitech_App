@@ -6,17 +6,22 @@ import {
   StyleSheet,
   FlatList,
   Dimensions,
+  TouchableOpacity,
+  Modal,
+  Button,
 } from "react-native";
-import { getAllProducts } from "../services/products";
+import { getAllProducts, getUserProducts } from "../services/products";
 import { useCallback } from "react";
+import colors from "../config/colors";
 
 const { width, height } = Dimensions.get("window");
 const CARD_WIDTH = (width - 30) / 2; // Calculate the card width based on screen width
 const NAVIGATION_BAR_HEIGHT = 50; // Adjust this value based on your navigation bar's height
 
-const Card = () => {
+const Card = ({ userId }) => {
   const [productListing, setProductListing] = useState([]);
-
+  const [isModalVisible, setIsModalVisible] = useState(false);
+  const [selectedProduct, setSelectedProduct] = useState(null);
   // Data for the cards
   const data = [
     {
@@ -46,6 +51,19 @@ const Card = () => {
 
   //   fetchProducts(); // Call the fetchProducts function when the component mounts
   // }, []);
+  const fetchUsersProducts = useCallback(async () => {
+    try {
+      const response = await getUserProducts(userId);
+      console.log(response.data);
+      setProductListing(response.data);
+    } catch (error) {
+      console.log(error);
+    }
+  }, [userId]);
+
+  useEffect(() => {
+    fetchUsersProducts();
+  }, [fetchUsersProducts]);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -60,37 +78,62 @@ const Card = () => {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-  // Render item function for FlatList
+
+  const handleCardPress = (product) => {
+    setSelectedProduct(product);
+    setIsModalVisible(true);
+  };
+
   const renderItem = ({ productListing, item }) => {
     const imageData = data.find((dataItem) => dataItem.id === item.id); // Find the image data corresponding to the current item
-    console.log('item:', item);
-    console.log('imageData:', imageData);
+    console.log("item:", item);
+    console.log("imageData:", imageData);
     return (
       <View style={[styles.card, { width: CARD_WIDTH }]}>
-        <Image
-          source={imageData.image}
-          style={styles.image}
-          resizeMode="cover"
-        />
-        <View style={styles.textContainer}>
-          <Text style={styles.title}>{productListing.modelName}</Text>
-          <Text style={styles.description}>{productListing.description}</Text>
-          <Text style={styles.price}>
-            Rs.{productListing.price.toLocaleString()}
-          </Text>
-          {/* <Text style={styles.price}>{productListing.quantity}</Text> */}
-        </View>
+        <TouchableOpacity onPress={() => handleCardPress(productListing)}>
+          <Image
+            source={imageData.image}
+            style={styles.image}
+            resizeMode="cover"
+          />
+          <View style={styles.textContainer}>
+            <Text style={styles.title}>{productListing.modelName}</Text>
+            <Text style={styles.description}>{productListing.description}</Text>
+            <Text style={styles.price}>
+              Rs.{productListing.price.toLocaleString()}
+            </Text>
+            {/* <Text style={styles.price}>{productListing.quantity}</Text> */}
+          </View>
+        </TouchableOpacity>
       </View>
     );
   };
 
   return (
-    <FlatList
-      data={productListing}
-      renderItem={({ item }) => renderItem({ productListing: item, item })} // keyExtractor={item => item.id.toString()}
-      contentContainerStyle={styles.container}
-      numColumns={2} // Set the number of columns to 2 for the grid layout
-    />
+    <View style={styles.container}>
+      <FlatList
+        data={productListing}
+        renderItem={({ item }) => renderItem({ productListing: item, item })}
+        numColumns={2} // Set the number of columns to 2 for the grid layout
+      />
+
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>{selectedProduct?.modelName}</Text>
+            <Text>{selectedProduct?.description}</Text>
+            <Text>Price: Rs.{selectedProduct?.price.toLocaleString()}</Text>
+            {/* Add more product details here */}
+            <Button title="Close" onPress={() => setIsModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
+    </View>
   );
 };
 
@@ -133,6 +176,30 @@ const styles = StyleSheet.create({
   price: {
     fontSize: 12,
     fontWeight: "bold",
+  },
+  modalContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalContent: {
+    width: "90%",
+    padding: 30,
+    backgroundColor: colors.white,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+  modalTitle: {
+    fontSize: 24,
+    fontWeight: "bold",
+    marginBottom: 10,
+  },
+  noProductsText: {
+    textAlign: "center",
+    fontSize: 18,
+    color: "gray",
+    marginTop: 20,
   },
 });
 

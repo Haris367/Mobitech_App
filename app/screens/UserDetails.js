@@ -52,8 +52,31 @@ const UserDetails = ({ navigation }) => {
             <Ionicons
               name="chevron-forward"
               size={15}
-              color={colors.white}
+              color={colors.white} 
               style={styles.arrowIcon}
+            />
+          </Text>
+        </TouchableOpacity>
+      </View>
+      <View style={styles.pageButton}>
+        <TouchableOpacity
+          style={styles.productButton}
+          onPress={() => navigation.navigate("MyAds")}
+        >
+          <Text
+            style={{
+              color: colors.white,
+              fontSize: 20,
+              left: 10,
+            }}
+          >
+            {" "}
+            My Products
+            <Ionicons
+              name="chevron-forward"
+              size={15}
+              color={colors.white}
+              // style={{ alignItems: "flex-end" }}
             />
           </Text>
         </TouchableOpacity>
@@ -72,6 +95,7 @@ const styles = StyleSheet.create({
     borderBottomLeftRadius: 20,
     borderBottomRightRadius: 20,
   },
+
   text: {
     color: colors.white,
     left: "10%",
@@ -85,7 +109,24 @@ const styles = StyleSheet.create({
       },
     }),
   },
+
   arrowIcon: {
-    alignItems: "center",
+    // alignItems: "flex-end",
+  },
+
+  pageButton: {
+    top: "40%",
+  },
+
+  productButton: {
+    width: "90%",
+    height: 50,
+    borderRadius: 15,
+    backgroundColor: colors.primary,
+    justifyContent: "center",
+    alignItems: "flex-start",
+    // alignContent:"center",
+    marginTop: 70,
+    left: "5%",
   },
 });

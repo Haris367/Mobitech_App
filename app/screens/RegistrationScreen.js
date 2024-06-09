@@ -20,6 +20,7 @@ import { signup } from "../services";
 
 const RegistrationScreen = ({ navigation }) => {
   const [name, setName] = useState("");
+  const [contactNumber, setContactNumber] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
@@ -37,6 +38,7 @@ const RegistrationScreen = ({ navigation }) => {
   const formik = useFormik({
     initialValues: {
       name: "",
+      contactNumber:"",
       email: "",
       password: "",
     },
@@ -49,10 +51,10 @@ const RegistrationScreen = ({ navigation }) => {
 
   const signupHandler = async (data) => {
     try {
-      const { name, email, password } = data;
+      const { name, contactNumber, email, password } = data;
       // const user = { name, email, password };
 
-      const response = await signup({ name, email, password });
+      const response = await signup({ name, contactNumber, email, password });
         console.log("signup Success", response);
       Alert.alert("Succesfully Signed up");
       navigation.navigate("Signin");
@@ -97,6 +99,24 @@ const RegistrationScreen = ({ navigation }) => {
               </View>
               {formik.touched.name && formik.errors.name && (
                 <Text style={styles.error}>{formik.errors.name}</Text>
+              )}
+              <View style={styles.inputIconContainer}>
+                <Ionicons
+                  name="phone-portrait-outline"
+                  size={20}
+                  color="gray"
+                  style={styles.inputIcon}
+                />
+                <TextInput
+                  style={styles.input}
+                  placeholder="Mobile Number"
+                  onChangeText={formik.handleChange("contactNumber")}
+                  value={formik.values.contactNumber}
+                  keyboardType="phone-pad"
+                />
+              </View>
+              {formik.touched.contactNumber && formik.errors.contactNumber && (
+                <Text style={styles.error}>{formik.errors.contactNumber}</Text>
               )}
 
               {/* Email Input */}

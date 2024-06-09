@@ -17,6 +17,7 @@ import {
   UserDetails,
   SellForMeScreen,
   WelcomeScreen,
+  MyAds,
 } from "./app/screens";
 import AppNavigation from "./app/navigation/NavigationContainer";
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs";
@@ -64,6 +65,7 @@ export const StackNav = () => {
       <Stack.Screen name="Profile" component={Profile} />
       <Stack.Screen name="Sell Your Phone" component={AdPostScreen} />
       <Stack.Screen name="Sell For Me" component={SellForMeScreen} />
+      <Stack.Screen name="MyAds" component={MyAds} />
     </Stack.Navigator>
   );
 };
@@ -82,31 +84,36 @@ export default function App() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [isShowSplash, setIsShowSplash] = useState(true);
 
-  async function getData() {
-    const data = await AsyncStorage.getItem("isLoggedIn");
-    console.log(data, "at app.js");
-    setIsLoggedIn(data);
-  }
-
   useEffect(() => {
-    getData();
-    setTimeout(() => {
-      setIsShowSplash(false);
-    }, 2000);
+    const fetchData = async () => {
+      try {
+        const data = await AsyncStorage.getItem("isLoggedIn");
+        setIsLoggedIn(data === "true"); // Convert the string to boolean
+      } catch (error) {
+        console.error("Failed to fetch data from AsyncStorage:", error);
+      } finally {
+        setTimeout(() => {
+          setIsShowSplash(false);
+        }, 2000); // Show splash screen for 2 seconds
+      }
+    };
+
+    fetchData();
   }, []);
 
-  // useEffect(() => {
-  //   getData();
-  //   setTimeout(() => {
-  //     setIsShowSplash(false);
-  //   }, 2000);
-  // });
+  if (isShowSplash) {
+    return <SplashScreen />;
+  }
+
   return (
     <NavigationContainer>
-
-      {isLoggedIn ? <TabNav /> : <LogNav />}
-      {/* <Toast/> */}
-      {/* {isShowSplash ? <SplashScreen /> : <StackNav />} */}
+      <Stack.Navigator screenOptions={{ headerShown: false }}>
+        {isLoggedIn ? (
+          <Stack.Screen name="Main" component={TabNav} />
+        ) : (
+          <Stack.Screen name="Login" component={LogNav} />
+        )}
+      </Stack.Navigator>
     </NavigationContainer>
   );
 }
