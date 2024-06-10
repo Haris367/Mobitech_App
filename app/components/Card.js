@@ -15,6 +15,7 @@ import { useCallback } from "react";
 import colors from "../config/colors";
 import { Linking } from "react-native";
 import Icon from "react-native-vector-icons/FontAwesome";
+import { TextInput } from "react-native";
 
 const { width, height } = Dimensions.get("window");
 const CARD_WIDTH = (width - 30) / 2; // Calculate the card width based on screen width
@@ -23,7 +24,9 @@ const NAVIGATION_BAR_HEIGHT = 50; // Adjust this value based on your navigation 
 const Card = ({ userId, isLoggedIn, product }) => {
   const [productListing, setProductListing] = useState([]);
   const [isModalVisible, setIsModalVisible] = useState(false);
+  const [isSecondModalVisible, setIsSecondModalVisible] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState(null);
+
   // Data for the cards
   const data = [
     {
@@ -85,6 +88,11 @@ const Card = ({ userId, isLoggedIn, product }) => {
     setSelectedProduct(product);
     setIsModalVisible(true);
   };
+
+  const handleInspect = () => {
+    setIsSecondModalVisible(true);
+  };
+
   // Add other images as needed
   const renderItem = ({ productListing, item }) => {
     const imageData = data.find((dataItem) => dataItem.id === item.id); // Find the image data corresponding to the current item
@@ -110,13 +118,13 @@ const Card = ({ userId, isLoggedIn, product }) => {
           </View>
         <TouchableOpacity onPress={() => handleCardPress(productListing)}>
           <Image
-            source={{uri: imageUri}}
+            source={imageData.image}
             style={styles.image}
             resizeMode="cover"
             onError={(error) => console.log("Image load error:", error)}
           />
           <View style={styles.textContainer}>
-            <Text style={styles.title}>{imageUri}</Text>
+            {/* <Text style={styles.title}>{imageUri}</Text> */}
             <Text style={styles.title}>{productListing.modelName}</Text>
             <Text style={styles.description}>{productListing.description}</Text>
             <Text style={styles.price}>
@@ -154,6 +162,7 @@ const Card = ({ userId, isLoggedIn, product }) => {
     }
   };
 
+
   return (
     <View style={styles.container}>
       <FlatList
@@ -175,8 +184,30 @@ const Card = ({ userId, isLoggedIn, product }) => {
             <Text>Price: Rs.{selectedProduct?.price.toLocaleString()}</Text>
             <Button title="Call Seller" onPress={handleCallSeller} />
             <Button title="Send SMS" onPress={handleSendSMS} />
+            <Button
+              title="Inspect"
+              onPress={handleInspect}
+            />
             {/* Add more product details here */}
             <Button title="Close" onPress={() => setIsModalVisible(false)} />
+          </View>
+        </View>
+      </Modal>
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={isSecondModalVisible}
+        onRequestClose={() => setIsSecondModalVisible(false)}
+      >
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalTitle}>Inspect Product</Text>
+            <TextInput
+              placeholder="Enter details..."
+              style={styles.input}
+            />
+            {/* Add more input fields as needed */}
+            <Button title="Close" onPress={() => setIsSecondModalVisible(false)} />
           </View>
         </View>
       </Modal>
